@@ -10,6 +10,7 @@ import org.koin.core.module.dsl.singleOf
 import org.koin.dsl.module
 import org.qosp.notes.data.sync.nextcloud.NextcloudAPI
 import org.qosp.notes.data.sync.nextcloud.ValidateNextcloud
+import org.qosp.notes.network.SimpleSSLTrustManager
 import retrofit2.Retrofit
 import retrofit2.create
 
@@ -25,7 +26,11 @@ object NextcloudModule {
             interceptor.redactHeader("Authorization")
             interceptor.redactHeader("Cookie")
             interceptor.redactHeader("Set-Cookie")
-            OkHttpClient.Builder().addInterceptor(interceptor).build()
+            
+            // Use trust-all SSL configuration for self-signed certificates
+            SimpleSSLTrustManager.createTrustAllClient().newBuilder()
+                .addInterceptor(interceptor)
+                .build()
         }
 
         singleOf(::ValidateNextcloud)
